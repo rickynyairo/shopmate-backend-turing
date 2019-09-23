@@ -25,3 +25,4 @@ export const UNAUTHORISED_LOGIN = {
     field: 'email & password',
   },
 };
+export const PAGE_SIZE = 50;
