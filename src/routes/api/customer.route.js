@@ -3,6 +3,7 @@ import CustomerController from '../../controllers/customer.controller';
 import { signupSchema, loginSchema } from '../../utils/validators/customer.validators';
 import { BAD_SIGNUP_LOGIN_REQUEST } from '../../utils/constants';
 import { validationMiddleware } from '../../middleware/validation';
+import { jwtAuthRequired } from '../../middleware/authentication';
 // These are valid routes but they may contain a bug, please try to define and fix them
 
 const router = Router();
@@ -17,8 +18,8 @@ router.post(
   validationMiddleware('user', loginSchema, BAD_SIGNUP_LOGIN_REQUEST),
   CustomerController.login
 );
-router.get('/customer', CustomerController.getCustomerProfile);
-router.put('/customer', CustomerController.apply);
+router.get('/customer', jwtAuthRequired, CustomerController.getCustomerProfile);
+router.put('/customer', CustomerController.updateCustomerProfile);
 router.put('/customer/address', CustomerController.updateCustomerAddress);
 router.put('/customer/creditCard', CustomerController.updateCreditCard);
 
