@@ -1,4 +1,6 @@
+/* eslint-disable camelcase */
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 module.exports = (sequelize, DataTypes) => {
   const Customer = sequelize.define(
@@ -72,6 +74,20 @@ module.exports = (sequelize, DataTypes) => {
   Customer.prototype.getSafeDataValues = function getSafeDataValues() {
     const { password, ...data } = this.dataValues;
     return data;
+  };
+  Customer.prototype.toAuthJson = function toAuthJson() {
+    const { email, customer_id } = this;
+    const expiresIn = '7d';
+    const accessToken = jwt.sign(
+      {
+        email,
+        customer_id,
+        expiresIn,
+      },
+      process.env.SESSION_SECRET,
+      { expiresIn }
+    );
+    return { accessToken, expiresIn };
   };
 
   Customer.associate = ({ Order }) => {
