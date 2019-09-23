@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /**
  * Customer controller handles all requests that has to do with customer
  * Some methods needs to be implemented from scratch while others may contain one or two bugs
@@ -13,7 +14,12 @@
  *  endpoints, request body/param, and response object for each of these method
  */
 import { Customer } from '../database/models';
-import { USER_ALREADY_EXISTS, UNAUTHORISED_LOGIN } from '../utils/constants';
+import {
+  USER_ALREADY_EXISTS,
+  UNAUTHORISED_LOGIN,
+  INVALID_CREDIT_CARD_UPDATE,
+} from '../utils/constants';
+import { creditCardValidator } from '../utils/creditcard.validator';
 /**
  *
  *
@@ -116,7 +122,18 @@ class CustomerController {
    */
   static async updateCustomerProfile(req, res, next) {
     // Implement function to update customer profile like name, day_phone, eve_phone and mob_phone
-    return res.status(200).json({ message: 'this works' });
+    const { customer_id, user } = req; // eslint-disable-line
+    if (user.email && (await Customer.findOne({ where: { email: user.email } }))) {
+      // the email provided exists in the db
+      return res.status(400).json(USER_ALREADY_EXISTS);
+    }
+    try {
+      const customer = await Customer.findByPk(customer_id);
+      const updatedCustomer = await customer.update(user);
+      return res.status(200).json(updatedCustomer);
+    } catch (error) {
+      return next(error);
+    }
   }
 
   /**
@@ -130,9 +147,16 @@ class CustomerController {
    * @memberof CustomerController
    */
   static async updateCustomerAddress(req, res, next) {
-    // write code to update customer address info such as address_1, address_2, city, region, postal_code, country
-    // and shipping_region_id
-    return res.status(200).json({ message: 'this works' });
+    // the customer_id and user objects are placed on the request
+    // by the authentication and validation middleware
+    const { customer_id, user } = req; // eslint-disable-line
+    try {
+      const customer = await Customer.findByPk(customer_id);
+      const updatedCustomer = await customer.update(user);
+      return res.status(200).json(updatedCustomer);
+    } catch (error) {
+      return next(error);
+    }
   }
 
   /**
@@ -146,8 +170,24 @@ class CustomerController {
    * @memberof CustomerController
    */
   static async updateCreditCard(req, res, next) {
-    // write code to update customer credit card number
-    return res.status(200).json({ message: 'this works' });
+    // the customer_id and credit_card objects are placed on the request
+    // by the authentication and validation middleware
+    const {
+      customer_id,
+      credit_card: { credit_card },
+    } = req; // eslint-disable-line
+    // validate credit card using card validator
+    if (!creditCardValidator(credit_card)) {
+      // the card number provided is not valid
+      return res.status(400).json(INVALID_CREDIT_CARD_UPDATE);
+    }
+    try {
+      const customer = await Customer.findByPk(customer_id);
+      const updatedCustomer = await customer.update(credit_card);
+      return res.status(200).json(updatedCustomer);
+    } catch (error) {
+      return next(error);
+    }
   }
 }
 
