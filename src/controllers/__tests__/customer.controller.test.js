@@ -3,18 +3,24 @@ import '@babel/polyfill';
 import request from 'supertest';
 
 import app, { server } from '../..';
-import { Customer } from '../../database/models';
 import truncate from '../../test/helpers';
 
-describe('customer controller', () => {
+describe('Customer Controller', () => {
   let customer;
+  let accessToken;
   beforeEach(async done => {
     await truncate();
-    customer = await Customer.create({
+    customer = {
       name: 'test customer',
       password: 'password',
       email: 'test_customer@email.com',
-    });
+    };
+    const response = await request(app)
+      .post('/customers/signup')
+      .set('Content-Type', 'application/json')
+      .send(customer);
+    // eslint-disable-next-line prefer-destructuring
+    accessToken = response.body.accessToken;
     done();
   });
 
@@ -141,6 +147,29 @@ describe('customer controller', () => {
           expect(res.status).toEqual(400);
           expect(res.body).toHaveProperty('error');
           expect(res.body.error).toHaveProperty('message');
+          done();
+        });
+    });
+  });
+  describe('Profile', () => {
+    it('should return the profile of an authenticated user', done => {
+      request(app)
+        .get('/customer')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .end((error, res) => {
+          expect(res.status).toEqual(200);
+          expect(res.body).toHaveProperty('customer_id');
+          expect(res.body.name).toEqual(customer.name);
+          done();
+        });
+    });
+    it('should not return the profile of an unauthorised user', done => {
+      request(app)
+        .get('/customer')
+        .set('Authorization', `Bearer faketoken`)
+        .end((error, res) => {
+          expect(res.status).toEqual(401);
+          expect(res.body).toHaveProperty('error');
           done();
         });
     });

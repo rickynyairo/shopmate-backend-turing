@@ -84,7 +84,7 @@ module.exports = (sequelize, DataTypes) => {
         customer_id,
         expiresIn,
       },
-      process.env.SESSION_SECRET,
+      process.env.JWT_KEY,
       { expiresIn }
     );
     return { accessToken, expiresIn };
