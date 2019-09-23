@@ -35,8 +35,8 @@ describe('product controller', () => {
         .set('Content-Type', 'application/json')
         .end((error, res) => {
           expect(res.status).toEqual(200);
-          expect(typeof res.body).toHaveProperty('rows');
-          expect(typeof res.body).toHaveProperty('pagination');
+          expect(res.body).toHaveProperty('rows');
+          expect(res.body).toHaveProperty('pagination');
           done();
         });
     });
