@@ -94,8 +94,14 @@ class CustomerController {
    * @memberof CustomerController
    */
   static async getCustomerProfile(req, res, next) {
-    const { customer } = req; // eslint-disable-line
-    return res.status(200).send(customer);
+    // fix the bugs in this code
+    const { customer_id } = req; // eslint-disable-line
+    try {
+      const customer = await Customer.findByPk(customer_id);
+      return res.status(200).json(customer);
+    } catch (error) {
+      return next(error);
+    }
   }
 
   /**
