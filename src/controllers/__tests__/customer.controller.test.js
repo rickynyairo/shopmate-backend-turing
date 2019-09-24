@@ -19,6 +19,11 @@ describe('Customer Controller', () => {
       .post('/customers/signup')
       .set('Content-Type', 'application/json')
       .send(customer);
+    // create a second user
+    await request(app)
+      .post('/customers/signup')
+      .set('Content-Type', 'application/json')
+      .send({ ...customer, email: 'test_customer2@email.com' });
     // eslint-disable-next-line prefer-destructuring
     accessToken = response.body.accessToken;
     done();
@@ -170,6 +175,157 @@ describe('Customer Controller', () => {
         .end((error, res) => {
           expect(res.status).toEqual(401);
           expect(res.body).toHaveProperty('error');
+          done();
+        });
+    });
+    it('should update the profile of an authenticated user', done => {
+      const newUserDetails = {
+        email: 'new_email@email.com',
+        name: 'new name',
+        day_phone: '254714393946',
+        eve_phone: '254714393947',
+        mob_phone: '254714393948',
+      };
+      request(app)
+        .put('/customer')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(newUserDetails)
+        .end((error, res) => {
+          expect(res.status).toEqual(200);
+          expect(res.body).toHaveProperty('customer_id');
+          expect(res.body.name).toEqual(newUserDetails.name);
+          done();
+        });
+    });
+    it('should not update the profile with an email that exists in the db', done => {
+      const newUserDetails = {
+        email: 'test_customer2@email.com',
+      };
+      request(app)
+        .put('/customer')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(newUserDetails)
+        .end((error, res) => {
+          expect(res.status).toEqual(400);
+          expect(res.body).toHaveProperty('error');
+          done();
+        });
+    });
+  });
+  describe('Address', () => {
+    it('should update the address of an authenticated user', done => {
+      const newUserDetails = {
+        address_1: '123 - Test Ave.',
+        address_2: '789 - Pass Str.',
+        city: 'nairobi',
+        region: 'allsops',
+        postal_code: '00100',
+        shipping_region_id: 7,
+      };
+      request(app)
+        .put('/customer/address')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(newUserDetails)
+        .end((error, res) => {
+          expect(res.status).toEqual(200);
+          expect(res.body).toHaveProperty('customer_id');
+          expect(res.body.address_1).toEqual(newUserDetails.address_1);
+          expect(res.body.address_2).toEqual(newUserDetails.address_2);
+          done();
+        });
+    });
+    it('should not update the address of an unauthenticated user', done => {
+      const newUserDetails = {
+        address_1: '123 - Test Ave.',
+        address_2: '789 - Pass Str.',
+        city: 'nairobi',
+        region: 'allsops',
+      };
+      request(app)
+        .put('/customer/address')
+        .set('Authorization', `Bearer faketoken`)
+        .send(newUserDetails)
+        .end((error, res) => {
+          expect(res.status).toEqual(401);
+          expect(res.body).toHaveProperty('error');
+          expect(res.body.error).toHaveProperty('message');
+          done();
+        });
+    });
+    it('should only update the address with valid data', done => {
+      const newUserDetails = {
+        address_1: '123 - Test Ave.',
+        address_2: '789 - Pass Str.',
+        shipping_region_id: 'should be an integer',
+      };
+      request(app)
+        .put('/customer/address')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(newUserDetails)
+        .end((error, res) => {
+          expect(res.status).toEqual(400);
+          expect(res.body).toHaveProperty('error');
+          expect(res.body.error).toHaveProperty('message');
+          done();
+        });
+    });
+    it('should not update with an empty request object', done => {
+      request(app)
+        .put('/customer/address')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({})
+        .end((error, res) => {
+          expect(res.status).toEqual(200);
+          expect(res.body).toHaveProperty('info');
+          expect(res.body.info).toHaveProperty('message');
+          done();
+        });
+    });
+  });
+  describe('Credit Card', () => {
+    it('should update the credit card details of an authenticated user', done => {
+      const creditCardDetails = {
+        credit_card: '4012888888881881',
+      };
+      request(app)
+        .put('/customer/creditCard')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(creditCardDetails)
+        .end((error, res) => {
+          expect(res.status).toEqual(200);
+          expect(res.body).toHaveProperty('customer_id');
+          expect(res.body.credit_card).toEqual(creditCardDetails.credit_card);
+          done();
+        });
+    });
+    it('should not update the credit card of an unauthenticated user', done => {
+      const creditCardDetails = {
+        credit_card: '1234567890',
+      };
+      request(app)
+        .put('/customer/creditCard')
+        .set('Authorization', `Bearer faketoken`)
+        .send(creditCardDetails)
+        .end((error, res) => {
+          expect(res.status).toEqual(401);
+          expect(res.body).toHaveProperty('error');
+          expect(res.body.error).toHaveProperty('message');
+          done();
+        });
+    });
+    it('should only update the credit card details with valid data', done => {
+      const creditCardDetails = {
+        credit_card: '1234567898765432123456677',
+      };
+      request(app)
+        .put('/customer/creditCard')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(creditCardDetails)
+        .end((error, res) => {
+          expect(res.status).toEqual(400);
+          expect(res.body).toHaveProperty('error');
+          expect(res.body.error).toHaveProperty('message');
+          expect(res.body.error.code).toEqual('USR_08');
           done();
         });
     });

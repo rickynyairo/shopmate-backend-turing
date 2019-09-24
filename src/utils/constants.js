@@ -26,6 +26,22 @@ export const UNAUTHORISED_LOGIN = {
   },
 };
 export const PAGE_SIZE = 50;
+export const INVALID_PROFILE_UPDATE = {
+  error: {
+    status: 401,
+    code: 'USR_06',
+    message: '',
+    field: '',
+  },
+};
+export const INVALID_ADDRESS_UPDATE = {
+  error: {
+    status: 401,
+    code: 'USR_09',
+    message: '',
+    field: '',
+  },
+};
 export const UNAUTHORISED_USER = {
   error: {
     status: 401,
@@ -33,5 +49,19 @@ export const UNAUTHORISED_USER = {
     message:
       'You are not authorized to access this resourse. Please check authorization credentials.',
     field: 'authorization',
+  },
+};
+export const NOTHING_TO_UPDATE = {
+  info: {
+    status: 200,
+    message: 'No updates were made as there was nothing in the request body',
+  },
+};
+export const INVALID_CREDIT_CARD_UPDATE = {
+  error: {
+    status: 401,
+    code: 'USR_08',
+    message: 'The credit card number provided is invalid',
+    field: 'credit_card',
   },
 };
