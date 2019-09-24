@@ -1,8 +1,9 @@
+/* eslint-disable camelcase */
 /**
  * Check each method in the shopping cart controller and add code to implement
  * the functionality or fix any bug.
  * The static methods and their function include:
- * 
+ *
  * - generateUniqueCart - To generate a unique cart id
  * - addItemToCart - To add new product to the cart
  * - getCart - method to get list of items in a cart
@@ -13,12 +14,12 @@
  * - getCustomerOrders - get all orders of a customer
  * - getOrderSummary - get the details of an order
  * - processStripePayment - process stripe payment
- * 
+ *
  *  NB: Check the BACKEND CHALLENGE TEMPLATE DOCUMENTATION in the readme of this repository to see our recommended
  *  endpoints, request body/param, and response object for each of these method
  */
-
- 
+import uuidv1 from 'uuid/v1';
+import { ShoppingCart } from '../database/models';
 /**
  *
  *
@@ -36,7 +37,8 @@ class ShoppingCartController {
    */
   static generateUniqueCart(req, res) {
     // implement method to generate unique cart Id
-    return res.status(200).json({ message: 'this works' });
+    const cart_id = uuidv1();
+    return res.status(200).json({ cart_id });
   }
 
   /**
@@ -49,7 +51,7 @@ class ShoppingCartController {
    * @memberof ShoppingCartController
    */
   static async addItemToCart(req, res, next) {
-    // implement function to add item to cart
+    // implement function to add item
     return res.status(200).json({ message: 'this works' });
   }
 
@@ -77,7 +79,7 @@ class ShoppingCartController {
    * @memberof ShoppingCartController
    */
   static async updateCartItem(req, res, next) {
-    const { item_id } = req.params // eslint-disable-line
+    const { item_id } = req.params; // eslint-disable-line
     return res.status(200).json({ message: 'this works' });
   }
 
@@ -106,7 +108,6 @@ class ShoppingCartController {
    * @memberof ShoppingCartController
    */
   static async removeItemFromCart(req, res, next) {
-
     try {
       // implement code to remove item from cart here
     } catch (error) {
@@ -141,7 +142,7 @@ class ShoppingCartController {
    * @memberof ShoppingCartController
    */
   static async getCustomerOrders(req, res, next) {
-    const { customer_id } = req;  // eslint-disable-line
+    const { customer_id } = req; // eslint-disable-line
     try {
       // implement code to get customer order
     } catch (error) {
@@ -159,8 +160,8 @@ class ShoppingCartController {
    * @memberof ShoppingCartController
    */
   static async getOrderSummary(req, res, next) {
-    const { order_id } = req.params;  // eslint-disable-line
-    const { customer_id } = req;   // eslint-disable-line
+    const { order_id } = req.params; // eslint-disable-line
+    const { customer_id } = req; // eslint-disable-line
     try {
       // write code to get order summary
     } catch (error) {
@@ -176,7 +177,7 @@ class ShoppingCartController {
    */
   static async processStripePayment(req, res, next) {
     const { email, stripeToken, order_id } = req.body; // eslint-disable-line
-    const { customer_id } = req;  // eslint-disable-line
+    const { customer_id } = req; // eslint-disable-line
     try {
       // implement code to process payment and send order confirmation email here
     } catch (error) {
