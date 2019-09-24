@@ -65,3 +65,11 @@ export const INVALID_CREDIT_CARD_UPDATE = {
     field: 'credit_card',
   },
 };
+export const INVALID_CART_ITEM = {
+  error: {
+    status: 400,
+    code: 'USR_20',
+    message: 'The item provided is invalid therefore cannot be added to the cart',
+    field: 'shoppingCart/item',
+  },
+};

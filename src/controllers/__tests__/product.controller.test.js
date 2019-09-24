@@ -9,7 +9,7 @@ import truncate from '../../test/helpers';
 describe('product controller', () => {
   let product;
   let department;
-  beforeEach(async done => {
+  beforeAll(async done => {
     await truncate();
     product = await Product.create({
       name: 'New T shirt',

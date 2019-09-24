@@ -37,7 +37,7 @@ class ShoppingCartController {
    */
   static generateUniqueCart(req, res) {
     // implement method to generate unique cart Id
-    const cart_id = uuidv1();
+    const cart_id = uuidv1().substring(0, 32);
     return res.status(200).json({ cart_id });
   }
 
@@ -52,7 +52,9 @@ class ShoppingCartController {
    */
   static async addItemToCart(req, res, next) {
     // implement function to add item
-    return res.status(200).json({ message: 'this works' });
+    const { item } = req;
+    const savedItem = await ShoppingCart.create(item);
+    return res.status(201).json(savedItem);
   }
 
   /**
@@ -65,8 +67,9 @@ class ShoppingCartController {
    * @memberof ShoppingCartController
    */
   static async getCart(req, res, next) {
-    // implement method to get cart items
-    return res.status(200).json({ message: 'this works' });
+    const { cart_id } = req.params;
+    const cartItems = await ShoppingCart.findAll({ where: { cart_id } });
+    return res.status(200).json(cartItems);
   }
 
   /**
