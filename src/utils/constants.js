@@ -80,3 +80,10 @@ export const NOT_FOUND = {
     message: 'The requested resource was not found on the server',
   },
 };
+export const INVALID_ORDER = {
+  error: {
+    status: 400,
+    code: 'USR_22',
+    message: 'The order sent has invalid items',
+  },
+};
