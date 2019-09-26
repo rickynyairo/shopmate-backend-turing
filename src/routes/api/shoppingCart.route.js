@@ -4,6 +4,8 @@ import { validationMiddleware } from '../../middleware/validation';
 import { jwtAuthRequired } from '../../middleware/authentication';
 import { INVALID_CART_ITEM } from '../../utils/constants';
 import { cartItemSchema } from '../../utils/validators/shoppingCart.validators';
+import { getObjectOr404 } from '../../middleware/finder';
+import { ShoppingCart } from '../../database/models';
 
 const router = Router();
 // use jwt authentication middleware for all shoppingcart routes
@@ -15,10 +17,15 @@ router.post(
   ShoppingCartController.addItemToCart
 );
 router.get('/shoppingcart/:cart_id', ShoppingCartController.getCart);
-router.put('/shoppingcart/update/:item_id', ShoppingCartController.updateCartItem);
+router.put(
+  '/shoppingcart/update/:item_id',
+  validationMiddleware('quantity', cartItemSchema, INVALID_CART_ITEM),
+  getObjectOr404('item', ShoppingCart),
+  ShoppingCartController.updateCartItem
+);
 router.delete('/shoppingcart/empty/:cart_id', ShoppingCartController.emptyCart);
 router.delete('/shoppingcart/removeProduct/:item_id', ShoppingCartController.removeItemFromCart);
-router.use('/orders', jwtAuthRequired);
+// router.use('/orders', jwtAuthRequired);
 router.post('/orders', ShoppingCartController.createOrder);
 router.get('/orders/inCustomer', ShoppingCartController.getCustomerOrders);
 router.get('/orders/:order_id', ShoppingCartController.getOrderSummary);

@@ -20,6 +20,7 @@
  */
 import uuidv1 from 'uuid/v1';
 import { ShoppingCart } from '../database/models';
+import { NOT_FOUND } from '../utils/constants';
 /**
  *
  *
@@ -52,9 +53,13 @@ class ShoppingCartController {
    */
   static async addItemToCart(req, res, next) {
     // implement function to add item
-    const { item } = req;
-    const savedItem = await ShoppingCart.create(item);
-    return res.status(201).json(savedItem);
+    try {
+      const { item } = req;
+      const savedItem = await ShoppingCart.create(item);
+      return res.status(201).json(savedItem);
+    } catch (error) {
+      return next();
+    }
   }
 
   /**
@@ -67,9 +72,15 @@ class ShoppingCartController {
    * @memberof ShoppingCartController
    */
   static async getCart(req, res, next) {
-    const { cart_id } = req.params;
-    const cartItems = await ShoppingCart.findAll({ where: { cart_id } });
-    return res.status(200).json(cartItems);
+    try {
+      const { cart_id } = req.params;
+      const cartItems = await ShoppingCart.findAll({ where: { cart_id } });
+      return cartItems.length > 0
+        ? res.status(200).json(cartItems)
+        : res.status(404).json(NOT_FOUND);
+    } catch (error) {
+      return next(error);
+    }
   }
 
   /**
@@ -82,8 +93,16 @@ class ShoppingCartController {
    * @memberof ShoppingCartController
    */
   static async updateCartItem(req, res, next) {
-    const { item_id } = req.params; // eslint-disable-line
-    return res.status(200).json({ message: 'this works' });
+    try {
+      // item and quantity are inserted in the request object by middleware
+      // item is inserted by the getObjectOr404 middleware
+      // quantity is inserted by the validation middleware
+      const { item, quantity } = req;
+      const newItem = await item.update(quantity);
+      return res.status(200).json(newItem);
+    } catch (error) {
+      return next(error);
+    }
   }
 
   /**
@@ -96,8 +115,15 @@ class ShoppingCartController {
    * @memberof ShoppingCartController
    */
   static async emptyCart(req, res, next) {
-    // implement method to empty cart
-    return res.status(200).json({ message: 'this works' });
+    try {
+      const { cart_id } = req.params;
+      const deleted = await ShoppingCart.destroy({ where: { cart_id } });
+      return deleted
+        ? res.status(200).json({ message: 'Shopping cart removed successfully' })
+        : res.status(404).json(NOT_FOUND);
+    } catch (error) {
+      return next(error);
+    }
   }
 
   /**
@@ -112,7 +138,11 @@ class ShoppingCartController {
    */
   static async removeItemFromCart(req, res, next) {
     try {
-      // implement code to remove item from cart here
+      const { item_id } = req.params;
+      const deleted = await ShoppingCart.destroy({ where: { item_id } });
+      return deleted
+        ? res.status(200).json({ message: 'Product successfully removed from cart' })
+        : res.status(404).json(NOT_FOUND);
     } catch (error) {
       return next(error);
     }
