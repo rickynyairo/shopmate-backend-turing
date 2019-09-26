@@ -73,3 +73,10 @@ export const INVALID_CART_ITEM = {
     field: 'shoppingCart/item',
   },
 };
+export const NOT_FOUND = {
+  error: {
+    status: 404,
+    code: 'USR_21',
+    message: 'The requested resource was not found on the server',
+  },
+};

@@ -1,13 +1,14 @@
+import { NOT_FOUND } from '../utils/constants';
+
 /* eslint-disable import/prefer-default-export */
-export const getObjectOr404 = model => {
+export const getObjectOr404 = (item, model) => {
   return async (req, res, next) => {
-    const modelName = model.name.toLowerCase();
-    const pk = req.params[`${modelName}_id`];
-    const item = await model.findByPk(pk);
-    if (!item) {
-      return res.status(404).send({ error: '404 not found' });
+    const pk = req.params[`${item}_id`];
+    const found = await model.findByPk(pk);
+    if (!found) {
+      return res.status(404).send(NOT_FOUND);
     }
-    req[modelName] = item;
+    req[item] = found;
     return next();
   };
 };
