@@ -12,7 +12,6 @@ describe('Shopping Cart Controller', () => {
   // let shoppingCartId;
   let accessToken;
   let shipping_region;
-  let shipping;
   beforeAll(async done => {
     await truncate();
     const customer = {
@@ -28,7 +27,7 @@ describe('Shopping Cart Controller', () => {
       shipping_cost: 10,
       shipping_region_id: shipping_region.shipping_region_id,
     };
-    shipping = Shipping.create(shipping_type);
+    await Shipping.create(shipping_type);
     // signup customer for access token
     const response = await request(app)
       .post('/customers/signup')
@@ -44,7 +43,7 @@ describe('Shopping Cart Controller', () => {
   });
 
   describe('Get shipping regions', () => {
-    it('get all shipping regions', done => {
+    it('should get all shipping regions', done => {
       request(app)
         .get('/shipping/regions')
         .set('Content-Type', 'application/json')
@@ -58,7 +57,7 @@ describe('Shopping Cart Controller', () => {
     });
   });
   describe('Get shipping types', () => {
-    it('get all shipping types in a shipping region', done => {
+    it('should get all shipping types in a shipping region', done => {
       request(app)
         .get(`/shipping/regions/${shipping_region.shipping_region_id}`)
         .set('Content-Type', 'application/json')

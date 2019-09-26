@@ -8,8 +8,6 @@ import app, { server } from '../..';
 import truncate from '../../test/helpers';
 
 describe('Shopping Cart Controller', () => {
-  // let shoppingCart;
-  // let shoppingCartId;
   let accessToken;
   let item_id;
   const cart_id = 'a3bf83f0-df17-11e9-a936-61dae1df';
