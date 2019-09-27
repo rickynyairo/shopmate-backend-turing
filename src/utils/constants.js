@@ -87,3 +87,10 @@ export const INVALID_ORDER = {
     message: 'The order sent has invalid items',
   },
 };
+export const INVALID_CHARGE = {
+  error: {
+    status: 400,
+    code: 'USR_23',
+    message: 'Charge could not be completed due to invalid request',
+  },
+};

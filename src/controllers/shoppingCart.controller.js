@@ -22,7 +22,9 @@
  */
 import uuidv1 from 'uuid/v1';
 import { ShoppingCart, Tax, Shipping, Product, Order, Customer } from '../database/models';
-import { NOT_FOUND } from '../utils/constants';
+import { NOT_FOUND, INVALID_CHARGE } from '../utils/constants';
+import { StripePayment } from '../utils/payments';
+
 /**
  *
  *
@@ -239,7 +241,7 @@ class ShoppingCartController {
           unit_cost: price,
           subtotal: quantity * price,
         });
-      };
+      }
       return res.status(200).json({ order_id, order_items });
     } catch (error) {
       return next(error);
@@ -275,10 +277,33 @@ class ShoppingCartController {
    * @param {*} next
    */
   static async processStripePayment(req, res, next) {
-    const { email, stripeToken, order_id } = req.body; // eslint-disable-line
-    const { customer_id } = req; // eslint-disable-line
     try {
-      // implement code to process payment and send order confirmation email here
+      const { email, stripeToken, order_id } = req.charge; // eslint-disable-line
+      const { customer_id } = req; // eslint-disable-line
+      const order = await Order.findByPk(order_id);
+      if (!order) {
+        // order id is invalid
+        return res.status(404).send(INVALID_CHARGE);
+      }
+      const { shipping_type } = await Shipping.findByPk(order.shipping_id);
+      const { name } = await Customer.findByPk(customer_id);
+      const description = order.comments;
+      const stripe = new StripePayment({
+        email,
+        name,
+        shipping_type,
+        description,
+        stripeToken,
+        order_id,
+        customer_id,
+        total_amount: order.total_amount,
+      });
+      const [success, payment] = await stripe.stripePayment();
+      if (!success) {
+        // failed, show error
+        throw payment;
+      }
+      return res.status.json(payment);
     } catch (error) {
       return next(error);
     }
