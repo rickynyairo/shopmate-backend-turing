@@ -38,5 +38,10 @@ router.get(
   getObjectOr404('order', Order),
   ShoppingCartController.getOrderSummary
 );
+router.get(
+  '/orders/shortDetails/:order_id',
+  getObjectOr404('order', Order),
+  ShoppingCartController.getOrderShortDetails
+);
 router.post('/stripe/charge', jwtAuthRequired, ShoppingCartController.processStripePayment);
 export default router;

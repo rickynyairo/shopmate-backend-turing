@@ -247,6 +247,28 @@ class ShoppingCartController {
   }
 
   /**
+   *
+   *
+   * @static
+   * @param {obj} req express request object
+   * @param {obj} res express response object
+   * @returns {json} returns json response with customer's orders
+   * @memberof ShoppingCartController
+   */
+  static async getOrderShortDetails(req, res, next) {
+    // eslint-disable-line
+    try {
+      // customer id and order are placed in the request object by middleware
+      const { customer_id, order } = req;
+      const { order_id, total_amount, created_on, shipped_on } = order;
+      const { name } = await Customer.findByPk(customer_id);
+      return res.status(200).send({ order_id, total_amount, created_on, shipped_on, name });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  /**
    * @static
    * @param {*} req
    * @param {*} res

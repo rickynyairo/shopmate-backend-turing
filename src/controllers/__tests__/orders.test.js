@@ -147,4 +147,20 @@ describe('Order Controller', () => {
         });
     });
   });
+  describe('Get order short details', () => {
+    it('should get short details of an order using the order_id', done => {
+      request(app)
+        .get(`/orders/shortDetails/${order.order_id}`)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .end((error, { body, status }) => {
+          expect(status).toEqual(200);
+          expect(body).toHaveProperty('order_id');
+          expect(body.order_id).toEqual(order.order_id);
+          expect(body).toHaveProperty('name');
+          expect(body.name).toEqual(customer.name);
+          done();
+        });
+    });
+  });
 });
