@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable camelcase */
 /**
  * Check each method in the shopping cart controller and add code to implement
@@ -19,8 +21,8 @@
  *  endpoints, request body/param, and response object for each of these method
  */
 import uuidv1 from 'uuid/v1';
-import { ShoppingCart, Tax, Shipping, Product, Order } from '../database/models';
-import { NOT_FOUND, INVALID_ORDER } from '../utils/constants';
+import { ShoppingCart, Tax, Shipping, Product, Order, Customer } from '../database/models';
+import { NOT_FOUND } from '../utils/constants';
 /**
  *
  *
@@ -165,9 +167,7 @@ class ShoppingCartController {
       const { tax_percentage } = await Tax.findByPk(tax_id);
       const { shipping_cost } = await Shipping.findByPk(shipping_id);
       let total_amount = 0;
-      // eslint-disable-next-line no-restricted-syntax
       for (const item of cartItems) {
-        // eslint-disable-next-line no-await-in-loop
         const { price } = await Product.findByPk(item.product_id);
         const itemCost = price * item.quantity;
         total_amount += itemCost;
@@ -198,9 +198,17 @@ class ShoppingCartController {
    * @memberof ShoppingCartController
    */
   static async getCustomerOrders(req, res, next) {
-    const { customer_id } = req; // eslint-disable-line
+    // eslint-disable-line
     try {
-      // implement code to get customer order
+      const { customer_id } = req;
+      const { name } = await Customer.findByPk(customer_id);
+      const orders = await Order.findAll({ where: { customer_id } });
+      const response = [];
+      for (const order of orders) {
+        const { order_id, created_on, shipped_on, total_amount } = order;
+        response.push({ order_id, total_amount, created_on, shipped_on, name });
+      }
+      return res.status(200).send(response);
     } catch (error) {
       return next(error);
     }
@@ -218,13 +226,10 @@ class ShoppingCartController {
   static async getOrderSummary(req, res, next) {
     try {
       const { order_id, reference } = req.order;
-      // return res.send(req.order);
       const cartItems = await ShoppingCart.findAll({ where: { cart_id: reference } });
       const order_items = [];
-      // eslint-disable-next-line no-restricted-syntax
       for (const item of cartItems) {
         const { product_id, attributes, quantity } = item;
-        // eslint-disable-next-line no-await-in-loop
         const { product_name, price } = await Product.findByPk(product_id);
         order_items.push({
           product_id,
@@ -237,7 +242,6 @@ class ShoppingCartController {
       };
       return res.status(200).json({ order_id, order_items });
     } catch (error) {
-      console.log(error);
       return next(error);
     }
   }

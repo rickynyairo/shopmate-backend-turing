@@ -131,4 +131,20 @@ describe('Order Controller', () => {
         });
     });
   });
+  describe('Get customers orders', () => {
+    it('should get all the orders made by a customer', done => {
+      request(app)
+        .get(`/orders/inCustomer`)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .end((error, res) => {
+          expect(res.status).toEqual(200);
+          expect(res.body).toHaveProperty('length');
+          expect(res.body.length).toBeGreaterThan(0);
+          expect(res.body[0]).toHaveProperty('name');
+          expect(res.body[0].name).toEqual('test customer');
+          done();
+        });
+    });
+  });
 });
