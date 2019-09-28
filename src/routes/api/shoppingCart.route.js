@@ -2,10 +2,11 @@ import { Router } from 'express';
 import ShoppingCartController from '../../controllers/shoppingCart.controller';
 import { validationMiddleware } from '../../middleware/validation';
 import { jwtAuthRequired } from '../../middleware/authentication';
-import { INVALID_CART_ITEM, INVALID_ORDER } from '../../utils/constants';
+import { INVALID_CART_ITEM, INVALID_ORDER, INVALID_CHARGE } from '../../utils/constants';
 import { cartItemSchema, orderSchema } from '../../utils/validators/shoppingCart.validators';
 import { getObjectOr404 } from '../../middleware/finder';
 import { ShoppingCart, Order } from '../../database/models';
+import { stripeChargeSchema } from '../../utils/validators/stripe.validator';
 
 const router = Router();
 // use jwt authentication middleware for all shoppingcart routes
@@ -43,5 +44,10 @@ router.get(
   getObjectOr404('order', Order),
   ShoppingCartController.getOrderShortDetails
 );
-router.post('/stripe/charge', jwtAuthRequired, ShoppingCartController.processStripePayment);
+router.post(
+  '/stripe/charge',
+  jwtAuthRequired,
+  validationMiddleware('charge', stripeChargeSchema, INVALID_CHARGE),
+  ShoppingCartController.processStripePayment
+);
 export default router;
