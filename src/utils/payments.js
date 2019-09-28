@@ -2,7 +2,7 @@
 import stripe from 'stripe';
 import EmailService from './email';
 
-export default class StripePayment {
+export default class PaymentService {
   constructor(paymentDetails) {
     const {
       stripeToken,
@@ -25,8 +25,18 @@ export default class StripePayment {
     this.order_id = order_id;
     this.email = email;
   }
+  /**
+   * stripe payment function
+   *
+   * @async
+   * @param {string} item the name of the object being verified
+   * @param {object} schema the Joi schema that will be used to verify
+   * @param {object} errorObject the error object to be returned incase of an error
+   * @returns {function} validation middleware function
+   * @memberof PaymentService
+   */
 
-  async stripePayment() {
+  async PaymentService() {
     try {
       const customer = await this.stripeAPI.customers.create({
         email: this.email,
@@ -50,7 +60,8 @@ export default class StripePayment {
       };
     } catch (error) {
       // TODO = integrate error logger
-      console.log(error);
+      // console.log(error);
+      error.status = 400;
       throw error;
     }
   }

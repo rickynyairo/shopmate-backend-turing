@@ -25,7 +25,7 @@ export const UNAUTHORISED_LOGIN = {
     field: 'email & password',
   },
 };
-export const PAGE_SIZE = 50;
+export const PAGE_SIZE = 20;
 export const INVALID_PROFILE_UPDATE = {
   error: {
     status: 401,
@@ -75,10 +75,10 @@ export const INVALID_CART_ITEM = {
 };
 export const NOT_FOUND = {
   error: {
-    status: 404,
     code: 'USR_21',
     message: 'The requested resource was not found on the server',
   },
+  status: 404,
 };
 export const INVALID_ORDER = {
   error: {
@@ -92,5 +92,12 @@ export const INVALID_CHARGE = {
     status: 400,
     code: 'USR_23',
     message: 'Charge could not be completed due to invalid request',
+  },
+};
+export const INVALID_QUERY_PARAMETERS = {
+  error: {
+    status: 400,
+    code: 'USR_24',
+    message: 'Cannot execute query with provided parameters, please check',
   },
 };

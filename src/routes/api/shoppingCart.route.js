@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import ShoppingCartController from '../../controllers/shoppingCart.controller';
-import { validationMiddleware } from '../../middleware/validation';
+import { requestValidation } from '../../middleware/validation';
 import { jwtAuthRequired } from '../../middleware/authentication';
 import { INVALID_CART_ITEM, INVALID_ORDER, INVALID_CHARGE } from '../../utils/constants';
 import { cartItemSchema, orderSchema } from '../../utils/validators/shoppingCart.validators';
@@ -17,12 +17,12 @@ router.delete('/shoppingcart/empty/:cart_id', ShoppingCartController.emptyCart);
 router.delete('/shoppingcart/removeProduct/:item_id', ShoppingCartController.removeItemFromCart);
 router.post(
   '/shoppingcart/add',
-  validationMiddleware('item', cartItemSchema, INVALID_CART_ITEM),
+  requestValidation('item', cartItemSchema, INVALID_CART_ITEM),
   ShoppingCartController.addItemToCart
 );
 router.put(
   '/shoppingcart/update/:item_id',
-  validationMiddleware('quantity', cartItemSchema, INVALID_CART_ITEM),
+  requestValidation('quantity', cartItemSchema, INVALID_CART_ITEM),
   getObjectOr404('item', ShoppingCart),
   ShoppingCartController.updateCartItem
 );
@@ -31,7 +31,7 @@ router.use('/orders', jwtAuthRequired);
 router.get('/orders/inCustomer', ShoppingCartController.getCustomerOrders);
 router.post(
   '/orders',
-  validationMiddleware('order', orderSchema, INVALID_ORDER),
+  requestValidation('order', orderSchema, INVALID_ORDER),
   ShoppingCartController.createOrder
 );
 router.get(
@@ -47,7 +47,7 @@ router.get(
 router.post(
   '/stripe/charge',
   jwtAuthRequired,
-  validationMiddleware('charge', stripeChargeSchema, INVALID_CHARGE),
+  requestValidation('charge', stripeChargeSchema, INVALID_CHARGE),
   ShoppingCartController.processStripePayment
 );
 export default router;
