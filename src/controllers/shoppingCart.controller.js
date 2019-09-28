@@ -23,7 +23,7 @@
 import uuidv1 from 'uuid/v1';
 import { ShoppingCart, Tax, Shipping, Product, Order, Customer } from '../database/models';
 import { NOT_FOUND, INVALID_CHARGE } from '../utils/constants';
-import { StripePayment } from '../utils/payments';
+import StripePayment from '../utils/payments';
 
 /**
  *
@@ -288,7 +288,7 @@ class ShoppingCartController {
       const { shipping_type } = await Shipping.findByPk(order.shipping_id);
       const { name } = await Customer.findByPk(customer_id);
       const description = order.comments;
-      const stripe = new StripePayment({
+      const pay = new StripePayment({
         email,
         name,
         shipping_type,
@@ -298,12 +298,18 @@ class ShoppingCartController {
         customer_id,
         total_amount: order.total_amount,
       });
-      const [success, payment] = await stripe.stripePayment();
+      const { success, charge } = await pay.stripePayment();
       if (!success) {
-        // failed, show error
-        throw payment;
+        // failed, throw error
+        throw charge;
       }
-      return res.status.json(payment);
+      return res.status(200).json({
+        stripeToken,
+        description,
+        order_id,
+        amount: charge.amount / 100,
+        currency: charge.currency,
+      });
     } catch (error) {
       return next(error);
     }
