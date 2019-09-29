@@ -3,8 +3,8 @@
 import sendgridClient from '@sendgrid/mail';
 
 export default class EmailService {
-  constructor() {
-    this.sendgrid = sendgridClient;
+  constructor(client = sendgridClient) {
+    this.sendgrid = client;
     this.sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
     this.sendgrid.setSubstitutionWrappers('{{', '}}');
   }
