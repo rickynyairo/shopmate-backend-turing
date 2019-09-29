@@ -15,7 +15,7 @@
  * - createOrder - Create an order
  * - getCustomerOrders - get all orders of a customer
  * - getOrderSummary - get the details of an order
- * - processStripePayment - process stripe payment
+ * - processStripePPayment - process stripe payment
  *
  *  NB: Check the BACKEND CHALLENGE TEMPLATE DOCUMENTATION in the readme of this repository to see our recommended
  *  endpoints, request body/param, and response object for each of these method
@@ -23,7 +23,7 @@
 import uuidv1 from 'uuid/v1';
 import { ShoppingCart, Tax, Shipping, Product, Order, Customer } from '../database/models';
 import { NOT_FOUND, INVALID_CHARGE } from '../utils/constants';
-import StripePayment from '../utils/payments';
+import PaymentService from '../utils/payments';
 
 /**
  *
@@ -271,10 +271,14 @@ class ShoppingCartController {
   }
 
   /**
+   * process order payment using stripe
+   *
    * @static
-   * @param {*} req
-   * @param {*} res
-   * @param {*} next
+   * @async
+   * @param {object} req express request object
+   * @param {object} res express response object
+   * @returns {json} returns json response with payment details
+   * @memberof ShoppingCartController
    */
   static async processStripePayment(req, res, next) {
     try {
@@ -288,7 +292,7 @@ class ShoppingCartController {
       const { shipping_type } = await Shipping.findByPk(order.shipping_id);
       const { name } = await Customer.findByPk(customer_id);
       const description = order.comments;
-      const pay = new StripePayment({
+      const pay = new PaymentService({
         email,
         name,
         shipping_type,
@@ -298,7 +302,7 @@ class ShoppingCartController {
         customer_id,
         total_amount: order.total_amount,
       });
-      const { success, charge } = await pay.stripePayment();
+      const { success, charge } = await pay.PaymentService();
       if (!success) {
         // failed, return  error
         return res.status(400).send(INVALID_CHARGE);

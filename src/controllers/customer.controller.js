@@ -19,7 +19,7 @@ import {
   UNAUTHORISED_LOGIN,
   INVALID_CREDIT_CARD_UPDATE,
 } from '../utils/constants';
-import { creditCardValidator } from '../utils/creditcard.validator';
+import { creditCardValidator } from '../utils/validators/creditcard.validator';
 /**
  *
  *

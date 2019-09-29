@@ -13,7 +13,7 @@ import {
   INVALID_ADDRESS_UPDATE,
   INVALID_CREDIT_CARD_UPDATE,
 } from '../../utils/constants';
-import { validationMiddleware } from '../../middleware/validation';
+import { requestValidation } from '../../middleware/validation';
 import { jwtAuthRequired } from '../../middleware/authentication';
 // These are valid routes but they may contain a bug, please try to define and fix them
 
@@ -21,30 +21,30 @@ const router = Router();
 router.post('/customers', CustomerController.updateCreditCard);
 router.post(
   '/customers/signup',
-  validationMiddleware('user', signupSchema, BAD_SIGNUP_LOGIN_REQUEST),
+  requestValidation('user', signupSchema, BAD_SIGNUP_LOGIN_REQUEST),
   CustomerController.create
 );
 router.post(
   '/customers/login',
-  validationMiddleware('user', loginSchema, BAD_SIGNUP_LOGIN_REQUEST),
+  requestValidation('user', loginSchema, BAD_SIGNUP_LOGIN_REQUEST),
   CustomerController.login
 );
 router.get('/customer', jwtAuthRequired, CustomerController.getCustomerProfile);
 router.put(
   '/customer',
-  validationMiddleware('user', userProfileSchema, INVALID_PROFILE_UPDATE),
+  requestValidation('user', userProfileSchema, INVALID_PROFILE_UPDATE),
   jwtAuthRequired,
   CustomerController.updateCustomerProfile
 );
 router.put(
   '/customer/address',
-  validationMiddleware('user', userAddressSchema, INVALID_ADDRESS_UPDATE),
+  requestValidation('user', userAddressSchema, INVALID_ADDRESS_UPDATE),
   jwtAuthRequired,
   CustomerController.updateCustomerAddress
 );
 router.put(
   '/customer/creditCard',
-  validationMiddleware('credit_card', userCreditCardSchema, INVALID_CREDIT_CARD_UPDATE),
+  requestValidation('credit_card', userCreditCardSchema, INVALID_CREDIT_CARD_UPDATE),
   jwtAuthRequired,
   CustomerController.updateCreditCard
 );
