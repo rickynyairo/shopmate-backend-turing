@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable import/prefer-default-export */
-import { NOTHING_TO_UPDATE, PAGE_SIZE } from '../utils/constants';
+import { NOTHING_TO_UPDATE, PAGE_SIZE, INVALID_QUERY_PARAMETERS } from '../utils/constants';
+import { querySchema } from '../utils/validators/product.validator';
 
 /**
  * request object validator
@@ -44,7 +45,7 @@ export const requestValidation = (item, schema, errorObject) => {
  * @param {object} errorObject the error object to be returned incase of an error
  * @returns {function} validation middleware function
  */
-export const queryValidation = (schema, errorObject) => {
+export const queryValidation = (schema = querySchema, errorObject = INVALID_QUERY_PARAMETERS) => {
   return (req, res, next) => {
     const { error, value } = schema.validate(req.query);
     if (error) {

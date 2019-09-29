@@ -12,7 +12,7 @@ describe('Shopping Cart Controller', () => {
   // let shoppingCartId;
   let accessToken;
   let shipping_region;
-  beforeAll(async done => {
+  beforeEach(async done => {
     await truncate();
     const customer = {
       name: 'test customer',
