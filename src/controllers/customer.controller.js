@@ -41,6 +41,7 @@ class CustomerController {
     const { email, name, password } = req.user;
     const [customer, created] = await Customer.findOrCreate({
       where: { email },
+      exclude: ['password', 'credit_card'],
       defaults: { name, password },
     });
     if (!created) {
@@ -123,7 +124,13 @@ class CustomerController {
   static async updateCustomerProfile(req, res, next) {
     // Implement function to update customer profile like name, day_phone, eve_phone and mob_phone
     const { customer_id, user } = req; // eslint-disable-line
-    if (user.email && (await Customer.findOne({ where: { email: user.email } }))) {
+    if (
+      user.email &&
+      (await Customer.findOne({
+        where: { email: user.email },
+        exclude: ['password', 'credit_card'],
+      }))
+    ) {
       // the email provided exists in the db
       return res.status(400).json(USER_ALREADY_EXISTS);
     }
