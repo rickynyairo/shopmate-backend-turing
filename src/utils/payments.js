@@ -36,7 +36,7 @@ export default class PaymentService {
    * @memberof PaymentService
    */
 
-  async PaymentService() {
+  async stripePayment() {
     try {
       const customer = await this.stripeAPI.customers.create({
         email: this.email,

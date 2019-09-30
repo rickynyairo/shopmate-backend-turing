@@ -23,7 +23,7 @@ describe('Order Controller', () => {
   let tax;
   let order;
   const cart_id = 'a3bf83f0-df17-11e9-a936-61dae1df';
-  beforeEach(async done => {
+  beforeAll(async done => {
     await truncate();
     product = await Product.create({
       name: 'Test Product',

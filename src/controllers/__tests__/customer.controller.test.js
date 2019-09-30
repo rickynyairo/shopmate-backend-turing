@@ -8,7 +8,7 @@ import truncate from '../../test/helpers';
 describe('Customer Controller', () => {
   let customer;
   let accessToken;
-  beforeEach(async done => {
+  beforeAll(async done => {
     await truncate();
     customer = {
       name: 'test customer',

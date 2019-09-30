@@ -302,7 +302,7 @@ class ShoppingCartController {
         customer_id,
         total_amount: order.total_amount,
       });
-      const { success, charge } = await pay.PaymentService();
+      const { success, charge } = await pay.stripePayment();
       if (!success) {
         // failed, return  error
         return res.status(400).send(INVALID_CHARGE);

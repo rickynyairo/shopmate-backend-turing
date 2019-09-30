@@ -1,9 +1,6 @@
 import 'jest';
 import EmailService from './email';
 
-jest.mock('jsonwebtoken', () => ({
-  sign: () => 'token',
-}));
 let mockSendgridClient;
 let email;
 
