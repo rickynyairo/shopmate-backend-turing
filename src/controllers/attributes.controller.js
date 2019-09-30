@@ -80,22 +80,6 @@ class AttributeController {
    * @param {*} next
    */
   static async getProductAttributes(req, res, next) {
-    // const { product_id } = req.params;
-    // try {
-    //   const attributes = await Attribute.findAll({
-    //     include: [
-    //       {
-    //         model: Product,
-    //         where: {
-    //           attribute_id,
-    //         },
-    //       },
-    //     ],
-    //   });
-    //   return res.json(attributes);
-    // } catch (error) {
-    //   return next(error);
-    // }
     return res.json({ todo: 'figure out structure' });
   }
 }

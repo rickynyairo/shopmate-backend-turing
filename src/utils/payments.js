@@ -46,6 +46,7 @@ export default class PaymentService {
         amount: Math.round(this.total_amount * 100),
         currency: 'usd',
         customer: customer.id,
+        metadata: { order_id: this.order_id },
       });
       await this.mailer.sendChargeEmail({
         email: this.email,
