@@ -59,6 +59,19 @@ class ShoppingCartController {
     // implement function to add item
     try {
       const { item } = req;
+      // find cart items
+      const cartItems = await ShoppingCart.findAll({ where: { cart_id: item.cart_id } });
+      // check if item is in cart
+      const inCart = cartItems.filter(cartItem => cartItem.product_id === item.product_id);
+      if (inCart.length > 0) {
+        // the item is in the cart
+        // increase quantity
+        const updatedItem = await inCart[0].update({
+          ...item,
+          quantity: inCart[0].quantity + item.quantity,
+        });
+        res.status(201).json(updatedItem);
+      }
       const savedItem = await ShoppingCart.create(item);
       return res.status(201).json(savedItem);
     } catch (error) {
