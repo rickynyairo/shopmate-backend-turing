@@ -41,17 +41,16 @@ class CustomerController {
     const { email, name, password } = req.user;
     const [customer, created] = await Customer.findOrCreate({
       where: { email },
-      exclude: ['password', 'credit_card'],
       defaults: { name, password },
     });
     if (!created) {
       // the user exists in the database
       return res.status(400).send(USER_ALREADY_EXISTS);
     }
+    const { customer_id, shipping_region_id } = customer;
     const { accessToken, expiresIn } = customer.toAuthJson();
-    delete customer.password;
     const response = {
-      customer,
+      customer: { customer_id, shipping_region_id, name: customer.name, email: customer.email },
       accessToken,
       expiresIn,
     };
@@ -71,7 +70,9 @@ class CustomerController {
   static async login(req, res, next) {
     // implement function to login to user account
     const { email, password } = req.user;
-    const customer = await Customer.findOne({ where: { email } });
+    const customer = await Customer.findOne({
+      where: { email },
+    });
     if (!customer) {
       // customer does not exist in database
       return res.status(400).send(UNAUTHORISED_LOGIN);
@@ -81,9 +82,11 @@ class CustomerController {
       // invalid password
       return res.status(400).send(UNAUTHORISED_LOGIN);
     }
+    const customerResponse = { ...customer.dataValues };
+    delete customerResponse.password;
     const { accessToken, expiresIn } = customer.toAuthJson();
     const response = {
-      customer,
+      customer: customerResponse,
       accessToken,
       expiresIn,
     };
@@ -104,7 +107,9 @@ class CustomerController {
     // fix the bugs in this code
     const { customer_id } = req; // eslint-disable-line
     try {
-      const customer = await Customer.findByPk(customer_id);
+      const customer = await Customer.findByPk(customer_id, {
+        attributes: { exclude: ['password'] },
+      });
       return res.status(200).json(customer);
     } catch (error) {
       return next(error);
@@ -135,7 +140,9 @@ class CustomerController {
       return res.status(400).json(USER_ALREADY_EXISTS);
     }
     try {
-      const customer = await Customer.findByPk(customer_id);
+      const customer = await Customer.findByPk(customer_id, {
+        attributes: { exclude: ['password'] },
+      });
       const updatedCustomer = await customer.update(user);
       return res.status(200).json(updatedCustomer);
     } catch (error) {
@@ -158,7 +165,9 @@ class CustomerController {
     // by the authentication and validation middleware
     const { customer_id, user } = req; // eslint-disable-line
     try {
-      const customer = await Customer.findByPk(customer_id);
+      const customer = await Customer.findByPk(customer_id, {
+        attributes: { exclude: ['password'] },
+      });
       const updatedCustomer = await customer.update(user);
       return res.status(200).json(updatedCustomer);
     } catch (error) {
@@ -189,7 +198,9 @@ class CustomerController {
       return res.status(400).json(INVALID_CREDIT_CARD_UPDATE);
     }
     try {
-      const customer = await Customer.findByPk(customer_id);
+      const customer = await Customer.findByPk(customer_id, {
+        attributes: { exclude: ['password'] },
+      });
       const updatedCustomer = await customer.update({ credit_card });
       return res.status(200).json(updatedCustomer);
     } catch (error) {
